@@ -9,6 +9,9 @@ pipeline{
         stage('build2'){
             steps{
                 echo "build2"
+                sh '''
+                pwd
+                '''
             }
         }
     }
