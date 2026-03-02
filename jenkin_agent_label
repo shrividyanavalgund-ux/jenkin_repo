@@ -1,14 +1,12 @@
 pipeline{
-    agent none
+    agent {label 'slave1'}
     stages{
-        agent {label 'slave1'}
         stage('build1'){
             steps{
                 echo "build1"
             }
         }
         stage('build2'){
-            agent {label 'slave1'}
             steps{
                 echo "build2"
                 sh '''
