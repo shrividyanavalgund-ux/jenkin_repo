@@ -1,35 +1,70 @@
 pipeline {
     agent any
 
+    parameters {
+        booleanParam(name: 'DEPLOY', description: 'Want to deploy to Production')
+    }
+    
     environment {
-       DOCKER_USER = 'jaintpharsha'
-       AWS_ACCESS_KEY = '65197561895639156'
+        CURRENT_ENV = 'prod'
     }
 
     stages {
-        stage('STAGE1') {
-            environment {
-                STAGE = 'stage1'
-            }
-                
+        stage('CEHCKOUT_REPOA') {
             steps {
-                echo "DOCKER_USER: ${env.DOCKER_USER}"
-                echo "AWS_ACCESS_KEY: ${env.AWS_ACCESS_KEY}"
-                echo "STAGE: ${env.STAGE}"
-            sh '''
-                env
-            '''
+                checkout ([ $class: 'GitSCM',
+                            branches: [[name: '*/main']], 
+                            extensions: [], 
+                            userRemoteConfigs: [[
+                                credentialsId: 'jaintpharsha', 
+                                url: 'https://github.com/jaintpharsha/mern_3tire.git'
+                            ]]
+                        ])
+               
+                sh '''
+                    echo GIT_BRANCH: $GIT_BRANCH
+                    echo BRANCH_NAME: $BRANCH_NAME
+                '''
             }
         }
-        
-         stage('STAGE2') {
+
+        stage('STAGE1 When branch main') {
+            when {
+                expression {
+                    return env.GIT_BRANCH == 'origin/main'
+                }
+            }
             steps {
-               echo "DOCKER_USER: ${env.DOCKER_USER}"
-               echo "AWS_ACCESS_KEY: ${env.AWS_ACCESS_KEY}"
-               echo "STAGE: ${env.STAGE}"
-               sh '''
-                   env
-               '''
+                echo "This is stage1 running"
+                sh ''' 
+                    pwd
+                    ls -lrt
+                    sleep 5
+                '''
+            }
+        }
+
+        stage('when environment') {
+            when {
+                environment name: 'CURRENT_ENV', value: 'prod'
+            }
+            steps {
+                echo "This is FINAL running"
+                sh '''
+                    pwd
+                    ls -lrt
+                    sleep 5
+                '''
+            }
+        }
+
+        stage('when parameter') {
+            when {
+                expression { params.DEPLOY == true }
+            }
+            steps {
+                echo "This is FINAL running"
+                sh 'sleep 5'
             }
         }
     }
