@@ -1,0 +1,20 @@
+pipeline{
+    agent none
+    stages{
+        stage('build1'){
+            agent {label 'slave1'}
+            steps{
+                echo "build1"
+            }
+        }
+        stage('build2'){
+            agent {label 'slave2'}
+            steps{
+                echo "build2"
+                sh '''
+                pwd
+                '''
+            }
+        }
+    }
+}
