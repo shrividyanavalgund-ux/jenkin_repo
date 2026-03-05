@@ -1,16 +1,12 @@
 pipeline {
     agent any
+
+    parameters {
+        booleanParam(name: 'DEPLOY', description: 'Want to deploy to Production')
+    }
     
     environment {
         CURRENT_ENV = 'prod'
-    }
-
-    // triggers {
-    //     pollSCM('H/5 * * * *')
-    // }
-
-     parameters {
-        booleanParam(name: 'DEPLOY', description: 'Want to deploy to Production')
     }
 
     stages {
@@ -25,6 +21,26 @@ pipeline {
                             ]]
                         ])
                
+                sh '''
+                    echo GIT_BRANCH: $GIT_BRANCH
+                    echo BRANCH_NAME: $BRANCH_NAME
+                '''
+            }
+        }
+
+        stage('STAGE1 When branch main') {
+            when {
+                expression {
+                    return env.GIT_BRANCH == 'origin/main'
+                }
+            }
+            steps {
+                echo "This is stage1 running"
+                sh ''' 
+                    pwd
+                    ls -lrt
+                    sleep 5
+                '''
             }
         }
 
