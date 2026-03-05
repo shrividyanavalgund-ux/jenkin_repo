@@ -10,7 +10,7 @@ pipeline {
     // }
 
      parameters {
-        booleanParam(name: 'DEPLOY', description: 'Want to deploy to Production')
+        booleanParam(name: 'DEPLOoY', description: 'Want to deploy to Production')
     }
 
     stages {
