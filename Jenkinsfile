@@ -1,54 +1,36 @@
 pipeline {
     agent any
-    
-    environment {
-        CURRENT_ENV = 'prod'
-    }
-
-    // triggers {
-    //     pollSCM('H/5 * * * *')
-    // }
-
-     parameters {
-        booleanParam(name: 'DEPLOoY', description: 'Want to deploy to Production')
-    }
 
     stages {
-        stage('CEHCKOUT_REPOA') {
+        stage('STAGE1') {
             steps {
-                checkout ([ $class: 'GitSCM',
-                            branches: [[name: '*/main']], 
-                            extensions: [], 
-                            userRemoteConfigs: [[
-                                credentialsId: 'shrividyanavalgund-ux', 
-                                url: 'https://github.com/shrividyanavalgund-ux/jenkin_repo.git'
-                            ]]
-                        ])
-               
+               echo "This is stage1 running"
+               sh 'sleep 5'
+            }
+        }
+        
+        stage('PARALLEL TESTING') {
+            parallel {
+                stage('WINDOWS TESTING') {
+                    steps {
+                    echo "This is WINDOWS testing running"
+                    sh 'sleep 5'
+                    }
+                }
+
+                stage('MACOS TESTING') {
+                    steps {
+                        echo "This is MACOS testing running"
+                        sh 'sleep 5'
+                    }
+                }
             }
         }
 
-        stage('when environment') {
-            when {
-                environment name: 'CURRENT_ENV', value: 'prod'
-            }
+        stage('FINAL') {
             steps {
-                echo "This is FINAL running"
-                sh '''
-                    pwd
-                    ls -lrt
-                    sleep 5
-                '''
-            }
-        }
-
-        stage('when parameter') {
-            when {
-                expression { params.DEPLOY == true }
-            }
-            steps {
-                echo "This is FINAL running"
-                sh 'sleep 5'
+               echo "This is FINAL running"
+               sh 'sleep 5'
             }
         }
     }
